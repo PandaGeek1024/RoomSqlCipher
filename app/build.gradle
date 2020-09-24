@@ -39,7 +39,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     implementation "androidx.room:room-ktx:$rootProject.roomVersion"
     androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
-//    implementation "net.zetetic:android-database-sqlcipher:4.4.0"
+    implementation "net.zetetic:android-database-sqlcipher:4.4.0"
     implementation "androidx.sqlite:sqlite:2.1.0"
 
 // Lifecycle components
