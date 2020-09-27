@@ -27,6 +27,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
+            db.setForeignKeyConstraintsEnabled(true)
         }
 
         override fun onOpen(db: SupportSQLiteDatabase) {
@@ -74,32 +75,6 @@ abstract class WordRoomDatabase : RoomDatabase() {
         const val DB_NAME = "word_database"
         const val encryptPassword = "123456789"
 
-        fun getDatabase(
-            context: Context
-        ): WordRoomDatabase {
-
-            val state = SQLCipherUtils.getDatabaseState(context, DB_NAME)
-            if (state == SQLCipherUtils.State.UNENCRYPTED) {
-                SQLCipherUtils.encrypt(context, DB_NAME, encryptPassword)
-            }
-            return INSTANCE ?: synchronized(this) {
-                val passphrase = SQLiteDatabase.getBytes(encryptPassword.toCharArray())
-                val factory = SupportFactory(passphrase)
-
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    WordRoomDatabase::class.java,
-                    DB_NAME
-                )
-                    .openHelperFactory(factory)
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-                    .addCallback(WordDatabaseCallback())
-                    .build()
-
-                INSTANCE = instance
-                return instance
-            }
-        }
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -182,6 +157,32 @@ abstract class WordRoomDatabase : RoomDatabase() {
 
     }
 
+    fun getDatabase(
+        context: Context
+    ): WordRoomDatabase {
 
+        val state = SQLCipherUtils.getDatabaseState(context, DB_NAME)
+        if (state == SQLCipherUtils.State.UNENCRYPTED) {
+            SQLCipherUtils.encrypt(context, DB_NAME, encryptPassword)
+        }
+        return INSTANCE ?: synchronized(this) {
+            val passphrase = SQLiteDatabase.getBytes(encryptPassword.toCharArray())
+            val factory = SupportFactory(passphrase)
+
+            val instance = Room.databaseBuilder(
+                context.applicationContext,
+                WordRoomDatabase::class.java,
+                DB_NAME
+            )
+                .openHelperFactory(factory)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                .addCallback(WordDatabaseCallback())
+                .build()
+
+            INSTANCE = instance
+            instance.openHelper.writableDatabase.setForeignKeyConstraintsEnabled(false)
+            return instance
+        }
+    }
 }
 
