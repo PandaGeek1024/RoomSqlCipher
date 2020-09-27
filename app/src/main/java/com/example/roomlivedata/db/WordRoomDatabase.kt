@@ -73,20 +73,20 @@ abstract class WordRoomDatabase : RoomDatabase() {
             context: Context
         ): WordRoomDatabase {
 
-            val state = SQLCipherUtils.getDatabaseState(context, DB_NAME)
-            if (state == SQLCipherUtils.State.UNENCRYPTED) {
-                SQLCipherUtils.encrypt(context, DB_NAME, encryptPassword)
-            }
+//            val state = SQLCipherUtils.getDatabaseState(context, DB_NAME)
+//            if (state == SQLCipherUtils.State.UNENCRYPTED) {
+//                SQLCipherUtils.encrypt(context, DB_NAME, encryptPassword)
+//            }
             return INSTANCE ?: synchronized(this) {
                 val passphrase = SQLiteDatabase.getBytes(encryptPassword.toCharArray())
-                val factory = SupportFactory(passphrase)
+//                val factory = SupportFactory(passphrase)
 
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     WordRoomDatabase::class.java,
                     DB_NAME
                 )
-                    .openHelperFactory(factory)
+//                    .openHelperFactory(factory)
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .build()
                 INSTANCE = instance
@@ -133,7 +133,9 @@ abstract class WordRoomDatabase : RoomDatabase() {
         private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 println("Migrate3_4........")
-                database.execSQL("PRAGMA foreign_keys=off;")
+                database.execSQL("PRAGMA foreign_keys=OFF;")
+
+                database.beginTransaction()
 
                 database.execSQL(
                     "CREATE TABLE  " + TABLE_COOLERS_CACHE + "_NEW"
@@ -158,7 +160,10 @@ abstract class WordRoomDatabase : RoomDatabase() {
                         + " RENAME TO " + TABLE_COOLERS_CACHE)
                 database.execSQL("DROP TABLE _OLD_COOLERS")
 
-                database.execSQL("PRAGMA foreign_keys=on;")
+                database.setTransactionSuccessful()
+                database.endTransaction()
+
+                database.execSQL("PRAGMA foreign_keys=ON;")
             }
         }
 
