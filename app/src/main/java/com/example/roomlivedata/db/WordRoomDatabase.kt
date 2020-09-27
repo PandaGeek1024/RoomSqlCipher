@@ -73,22 +73,23 @@ abstract class WordRoomDatabase : RoomDatabase() {
             context: Context
         ): WordRoomDatabase {
 
-//            val state = SQLCipherUtils.getDatabaseState(context, DB_NAME)
-//            if (state == SQLCipherUtils.State.UNENCRYPTED) {
-//                SQLCipherUtils.encrypt(context, DB_NAME, encryptPassword)
-//            }
+            val state = SQLCipherUtils.getDatabaseState(context, DB_NAME)
+            if (state == SQLCipherUtils.State.UNENCRYPTED) {
+                SQLCipherUtils.encrypt(context, DB_NAME, encryptPassword)
+            }
             return INSTANCE ?: synchronized(this) {
                 val passphrase = SQLiteDatabase.getBytes(encryptPassword.toCharArray())
-//                val factory = SupportFactory(passphrase)
+                val factory = SupportFactory(passphrase)
 
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     WordRoomDatabase::class.java,
                     DB_NAME
                 )
-//                    .openHelperFactory(factory)
+                    .openHelperFactory(factory)
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .build()
+
                 INSTANCE = instance
                 return instance
             }
@@ -135,6 +136,9 @@ abstract class WordRoomDatabase : RoomDatabase() {
                 println("Migrate3_4........")
                 database.execSQL("PRAGMA foreign_keys=OFF;")
 
+                val db = database as SQLiteDatabase
+                db.setForeignKeyConstraintsEnabled(false)
+
                 database.beginTransaction()
 
                 database.execSQL(
@@ -162,6 +166,8 @@ abstract class WordRoomDatabase : RoomDatabase() {
 
                 database.setTransactionSuccessful()
                 database.endTransaction()
+
+                db.setForeignKeyConstraintsEnabled(true)
 
                 database.execSQL("PRAGMA foreign_keys=ON;")
             }
