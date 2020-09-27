@@ -7,13 +7,14 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.roomlivedata.db.dao.WordDao
+import com.example.roomlivedata.db.entity.Book
 import com.example.roomlivedata.db.entity.CoolerData
 import com.example.roomlivedata.db.entity.Word
 import kotlinx.coroutines.*
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
-@Database(entities = arrayOf(Word::class, CoolerData::class), version = 2, exportSchema = false)
+@Database(entities = arrayOf(Word::class, CoolerData::class, Book::class), version = 3, exportSchema = false)
 public abstract class WordRoomDatabase : RoomDatabase() {
 
     private class WordDatabaseCallback(
@@ -51,6 +52,7 @@ public abstract class WordRoomDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: WordRoomDatabase? = null
 
+        const val TABLE_BOOK = "book_table"
         const val TABLE_COOLERS_CACHE =
             "coolers" //rename as device or controller.  In future we may track more than coolers
         const val COOLER_COLUMN_ID = "_id"
@@ -120,7 +122,7 @@ public abstract class WordRoomDatabase : RoomDatabase() {
                     WordRoomDatabase::class.java,
                     DB_NAME
                 ).openHelperFactory(factory)
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 return instance
@@ -132,6 +134,21 @@ public abstract class WordRoomDatabase : RoomDatabase() {
                 println("Migrate........")
                 database.execSQL(
                     "CREATE TABLE  " + TABLE_COOLERS_CACHE
+                            + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
+                            + COOLER_COLUMN_COOLER_ID + " TEXT NOT NULL, "
+                            + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
+                            + COOLER_COLUMN_COOLER_OEM_ID + " INTEGER NOT NULL DEFAULT 0, "
+                            + COOLER_COLUMN_COOLER_BOTTLER_ID + " INTEGER NOT NULL DEFAULT 0, "
+                            + COOLER_COLUMN_LIGHTING_PRESET + " INTEGER NOT NULL DEFAULT 0 )"
+                )
+            }
+        }
+
+        private val MIGRATION_2_3: Migration = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                println("Migrate2_3........")
+                database.execSQL(
+                    "CREATE TABLE  " + TABLE_BOOK
                             + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
                             + COOLER_COLUMN_COOLER_ID + " TEXT NOT NULL, "
                             + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
