@@ -22,16 +22,21 @@ import net.sqlcipher.database.SupportFactory
 abstract class WordRoomDatabase : RoomDatabase() {
 
     private class WordDatabaseCallback(
-        private val scope: CoroutineScope
+        private val scope: CoroutineScope? =null
     ) : RoomDatabase.Callback() {
+
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            super.onCreate(db)
+        }
 
         override fun onOpen(db: SupportSQLiteDatabase) {
             super.onOpen(db)
-            INSTANCE?.let { database ->
-                scope.launch {
-                    populateDatabase(database.wordDao())
-                }
-            }
+            println()
+//            INSTANCE?.let { database ->
+//                scope.launch {
+//                    populateDatabase(database.wordDao())
+//                }
+//            }
         }
 
         suspend fun populateDatabase(wordDao: WordDao) {
@@ -87,7 +92,8 @@ abstract class WordRoomDatabase : RoomDatabase() {
                     DB_NAME
                 )
                     .openHelperFactory(factory)
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addCallback(WordDatabaseCallback())
                     .build()
 
                 INSTANCE = instance
