@@ -14,7 +14,11 @@ import kotlinx.coroutines.*
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
-@Database(entities = arrayOf(Word::class, CoolerData::class, Book::class), version = 3, exportSchema = false)
+@Database(
+    entities = arrayOf(Word::class, CoolerData::class, Book::class),
+    version = 3,
+    exportSchema = false
+)
 public abstract class WordRoomDatabase : RoomDatabase() {
 
     private class WordDatabaseCallback(
@@ -140,6 +144,10 @@ public abstract class WordRoomDatabase : RoomDatabase() {
                             + COOLER_COLUMN_COOLER_BOTTLER_ID + " INTEGER NOT NULL DEFAULT 0, "
                             + COOLER_COLUMN_LIGHTING_PRESET + " INTEGER NOT NULL DEFAULT 0 )"
                 )
+                database.execSQL(
+                    "INSERT INTO " + TABLE_COOLERS_CACHE + " VALUES ( null, '123', 987, 456, 123)"
+                )
+
             }
         }
 
@@ -150,12 +158,12 @@ public abstract class WordRoomDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE  " + TABLE_BOOK
                             + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
-                            + COOLER_COLUMN_COOLER_ID + " TEXT NOT NULL, "
+                            + COOLER_COLUMN_COOLER_ID + " INTEGER NOT NULL, "
                             + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
-                            + COOLER_COLUMN_COOLER_OEM_ID + " INTEGER NOT NULL DEFAULT 0, "
-                            + COOLER_COLUMN_COOLER_BOTTLER_ID + " INTEGER NOT NULL DEFAULT 0, "
-                            + COOLER_COLUMN_LIGHTING_PRESET + " INTEGER NOT NULL DEFAULT 0, "
                             + " FOREIGN KEY (" + COOLER_COLUMN_COOLER_ID + ") REFERENCES " + TABLE_COOLERS_CACHE + "(" + COOLER_COLUMN_ID + ") ON DELETE CASCADE )"
+                )
+                database.execSQL(
+                    "INSERT INTO " + TABLE_BOOK + " VALUES ( null, 1, 987)"
                 )
                 database.execSQL("PRAGMA foreign_keys=on;")
             }
