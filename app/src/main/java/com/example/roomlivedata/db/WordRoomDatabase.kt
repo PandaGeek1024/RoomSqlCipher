@@ -150,7 +150,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
                         + COOLER_COLUMN_COOLER_OEM_ID + ", "
                         + COOLER_COLUMN_COOLER_BOTTLER_ID + ", "
                         + COOLER_COLUMN_LIGHTING_PRESET
-                        + " FROM " + TABLE_COOLERS_CACHE + ","
+                        + " FROM " + TABLE_COOLERS_CACHE + ";"
                 )
                 database.execSQL("ALTER TABLE  " + TABLE_COOLERS_CACHE
                         + " RENAME TO _OLD_COOLERS")
