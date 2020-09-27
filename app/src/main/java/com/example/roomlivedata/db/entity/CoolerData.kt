@@ -35,9 +35,6 @@ internal class CoolerData {
     @ColumnInfo(name = WordRoomDatabase.COOLER_COLUMN_ID)
     var coolerId: Long = 0
 
-    @ColumnInfo(name = WordRoomDatabase.COOLER_COLUMN_COOLER_ID)
-    var scsCoolerName: String = ""
-
     @ColumnInfo(name = WordRoomDatabase.COOLER_COLUMN_COOLER_SERIAL)
     var coolerSerialNumber: String = ""
 
@@ -64,16 +61,16 @@ internal class CoolerData {
 
 
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || javaClass != other.javaClass) return false
-        val that = other as CoolerData
-        return scsCoolerName == that.scsCoolerName
-    }
-
-    override fun hashCode(): Int {
-        return scsCoolerName.hashCode()
-    }
+//    override fun equals(other: Any?): Boolean {
+//        if (this === other) return true
+//        if (other == null || javaClass != other.javaClass) return false
+//        val that = other as CoolerData
+//        return scsCoolerName == that.scsCoolerName
+//    }
+//
+//    override fun hashCode(): Int {
+//        return scsCoolerName.hashCode()
+//    }
 
     override fun toString(): String {
         return "CoolerData{" +

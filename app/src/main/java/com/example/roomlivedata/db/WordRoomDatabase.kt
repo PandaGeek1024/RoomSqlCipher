@@ -135,7 +135,6 @@ public abstract class WordRoomDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE  " + TABLE_COOLERS_CACHE
                             + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
-                            + COOLER_COLUMN_COOLER_ID + " TEXT NOT NULL, "
                             + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
                             + COOLER_COLUMN_COOLER_OEM_ID + " INTEGER NOT NULL DEFAULT 0, "
                             + COOLER_COLUMN_COOLER_BOTTLER_ID + " INTEGER NOT NULL DEFAULT 0, "
@@ -147,6 +146,7 @@ public abstract class WordRoomDatabase : RoomDatabase() {
         private val MIGRATION_2_3: Migration = object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 println("Migrate2_3........")
+                database.execSQL("PRAGMA foreign_keys=off;")
                 database.execSQL(
                     "CREATE TABLE  " + TABLE_BOOK
                             + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
@@ -154,8 +154,10 @@ public abstract class WordRoomDatabase : RoomDatabase() {
                             + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
                             + COOLER_COLUMN_COOLER_OEM_ID + " INTEGER NOT NULL DEFAULT 0, "
                             + COOLER_COLUMN_COOLER_BOTTLER_ID + " INTEGER NOT NULL DEFAULT 0, "
-                            + COOLER_COLUMN_LIGHTING_PRESET + " INTEGER NOT NULL DEFAULT 0 )"
+                            + COOLER_COLUMN_LIGHTING_PRESET + " INTEGER NOT NULL DEFAULT 0, "
+                            + " FOREIGN KEY (" + COOLER_COLUMN_COOLER_ID + ") REFERENCES " + TABLE_COOLERS_CACHE + "(" + COOLER_COLUMN_ID + ") ON DELETE CASCADE )"
                 )
+                database.execSQL("PRAGMA foreign_keys=on;")
             }
         }
 
