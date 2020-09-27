@@ -113,19 +113,20 @@ public abstract class WordRoomDatabase : RoomDatabase() {
             context: Context
         ): WordRoomDatabase {
 
-            val state = SQLCipherUtils.getDatabaseState(context, DB_NAME)
-            if (state == SQLCipherUtils.State.UNENCRYPTED) {
-                SQLCipherUtils.encrypt(context, DB_NAME, encryptPassword)
-            }
+//            val state = SQLCipherUtils.getDatabaseState(context, DB_NAME)
+//            if (state == SQLCipherUtils.State.UNENCRYPTED) {
+//                SQLCipherUtils.encrypt(context, DB_NAME, encryptPassword)
+//            }
             return INSTANCE ?: synchronized(this) {
-                val passphrase = SQLiteDatabase.getBytes(encryptPassword.toCharArray())
-                val factory = SupportFactory(passphrase)
+//                val passphrase = SQLiteDatabase.getBytes(encryptPassword.toCharArray())
+//                val factory = SupportFactory(passphrase)
 
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     WordRoomDatabase::class.java,
                     DB_NAME
-                ).openHelperFactory(factory)
+                )
+//                    .openHelperFactory(factory)
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                 INSTANCE = instance

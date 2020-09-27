@@ -22,7 +22,7 @@ class Book {
     var coolerId: Long = 0
 
     @ColumnInfo(name = WordRoomDatabase.COOLER_COLUMN_COOLER_ID)
-    var scsCoolerName: String = ""
+    var scsCoolerName: Long = 0
 
     @ColumnInfo(name = WordRoomDatabase.COOLER_COLUMN_COOLER_SERIAL)
     var coolerSerialNumber: String = ""
