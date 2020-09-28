@@ -32,6 +32,10 @@ abstract class WordRoomDatabase : RoomDatabase() {
 
         override fun onOpen(db: SupportSQLiteDatabase) {
             super.onOpen(db)
+            if (!db.isReadOnly()) {
+                // Enable foreign key constraints
+                db.execSQL("PRAGMA foreign_keys=ON;");
+            }
             println()
 //            INSTANCE?.let { database ->
 //                scope.launch {
@@ -113,7 +117,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
         private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 println("Migrate3_4........")
-//                database.execSQL("PRAGMA foreign_keys=OFF;")
+                database.execSQL("PRAGMA foreign_keys=OFF;")
 
                 database.execSQL(
                     "CREATE TABLE  " + TABLE_COOLERS_CACHE + "_NEW"
@@ -139,28 +143,28 @@ abstract class WordRoomDatabase : RoomDatabase() {
                 database.execSQL("DROP TABLE _OLD_COOLERS")
 
 
-                //try create a new book table to point to coolers table
-                database.execSQL(
-                    "CREATE TABLE  " + TABLE_BOOK + "_NEW"
-                            + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
-                            + COOLER_COLUMN_COOLER_ID + " INTEGER NOT NULL, "
-                            + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
-                            + " FOREIGN KEY (" + COOLER_COLUMN_COOLER_ID + ") REFERENCES " + TABLE_COOLERS_CACHE + "(" + COOLER_COLUMN_ID + ") ON DELETE CASCADE )"
-                )
-                database.execSQL("INSERT INTO " + TABLE_BOOK + "_NEW"
-                        + " SELECT "
-                        + COOLER_COLUMN_ID + ", "
-                        + COOLER_COLUMN_COOLER_ID + ", "
-                        + COOLER_COLUMN_COOLER_SERIAL
-                        + " FROM " + TABLE_BOOK + ";"
-                )
-                database.execSQL("ALTER TABLE  " + TABLE_BOOK
-                        + " RENAME TO _OLD_BOOK")
-                database.execSQL("ALTER TABLE  " + TABLE_BOOK + "_NEW"
-                        + " RENAME TO " + TABLE_BOOK)
-                database.execSQL("DROP TABLE _OLD_BOOK")
+//                //try create a new book table to point to coolers table
+//                database.execSQL(
+//                    "CREATE TABLE  " + TABLE_BOOK + "_NEW"
+//                            + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
+//                            + COOLER_COLUMN_COOLER_ID + " INTEGER NOT NULL, "
+//                            + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
+//                            + " FOREIGN KEY (" + COOLER_COLUMN_COOLER_ID + ") REFERENCES " + TABLE_COOLERS_CACHE + "(" + COOLER_COLUMN_ID + ") ON DELETE CASCADE )"
+//                )
+//                database.execSQL("INSERT INTO " + TABLE_BOOK + "_NEW"
+//                        + " SELECT "
+//                        + COOLER_COLUMN_ID + ", "
+//                        + COOLER_COLUMN_COOLER_ID + ", "
+//                        + COOLER_COLUMN_COOLER_SERIAL
+//                        + " FROM " + TABLE_BOOK + ";"
+//                )
+//                database.execSQL("ALTER TABLE  " + TABLE_BOOK
+//                        + " RENAME TO _OLD_BOOK")
+//                database.execSQL("ALTER TABLE  " + TABLE_BOOK + "_NEW"
+//                        + " RENAME TO " + TABLE_BOOK)
+//                database.execSQL("DROP TABLE _OLD_BOOK")
 
-//                database.execSQL("PRAGMA foreign_keys=ON;")
+                database.execSQL("PRAGMA foreign_keys=ON;")
             }
         }
         fun getDatabase(
@@ -184,7 +188,6 @@ abstract class WordRoomDatabase : RoomDatabase() {
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .addCallback(WordDatabaseCallback())
                     .build()
-
                 INSTANCE = instance
                 return instance
             }
