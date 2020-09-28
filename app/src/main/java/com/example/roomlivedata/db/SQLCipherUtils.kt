@@ -230,14 +230,28 @@ object SQLCipherUtils {
         SQLiteDatabase.loadLibs(context)
         if (originalFile.exists()) {
             val newFile = File("/data/user/0/com.example.roomlivedata/databases/encrypted_word_database")
+            newFile.createNewFile()
             var db =
                 SQLiteDatabase.openDatabase(
                     originalFile.absolutePath,
                     "", null, SQLiteDatabase.OPEN_READWRITE
                 )
-            db.rawExecSQL("ATTACH DATABASE ${newFile.absolutePath} AS encrypted KEY '123456789'")
+            val encryptedDb = SQLiteDatabase.openDatabase(
+                newFile.absolutePath, passphrase,
+                null, SQLiteDatabase.OPEN_READWRITE, null, null
+            )
+            encryptedDb.rawExecSQL("SELECT name FROM sqlite_master ")
+            val version = encryptedDb.version
+            encryptedDb.close()
+            val st =
+                db.compileStatement("ATTACH DATABASE ? AS encrypted KEY '123456789'")
+            st.bindString(1, newFile.absolutePath)
+            st.execute()
+
             db.rawExecSQL("SELECT sqlcipher_export('encrypted')")
             db.rawExecSQL("DETACH DATABASE encrypted")
+
+
 
             db.close()
         } else {

@@ -27,7 +27,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
-            db.setForeignKeyConstraintsEnabled(true)
+//            db.setForeignKeyConstraintsEnabled(true)
         }
 
         override fun onOpen(db: SupportSQLiteDatabase) {
@@ -182,7 +182,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     WordRoomDatabase::class.java,
-                    DB_NAME
+                    "encrypted_word_database"
                 )
                     .openHelperFactory(factory)
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
