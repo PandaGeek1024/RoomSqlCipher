@@ -120,7 +120,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
                 val db = database as SQLiteDatabase
 //                db.setForeignKeyConstraintsEnabled(false)
 
-                database.beginTransaction()
+//                database.beginTransaction()
 
                 database.execSQL(
                     "CREATE TABLE  " + TABLE_COOLERS_CACHE + "_NEW"
@@ -145,8 +145,31 @@ abstract class WordRoomDatabase : RoomDatabase() {
                         + " RENAME TO " + TABLE_COOLERS_CACHE)
                 database.execSQL("DROP TABLE _OLD_COOLERS")
 
-                database.setTransactionSuccessful()
-                database.endTransaction()
+
+                //try create a new book table to point to coolers table
+                database.execSQL(
+                    "CREATE TABLE  " + TABLE_BOOK + "_NEW"
+                            + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
+                            + COOLER_COLUMN_COOLER_ID + " INTEGER NOT NULL, "
+                            + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
+                            + " FOREIGN KEY (" + COOLER_COLUMN_COOLER_ID + ") REFERENCES " + TABLE_COOLERS_CACHE + "(" + COOLER_COLUMN_ID + ") ON DELETE CASCADE )"
+                )
+                database.execSQL("INSERT INTO " + TABLE_BOOK + "_NEW"
+                        + " SELECT "
+                        + COOLER_COLUMN_ID + ", "
+                        + COOLER_COLUMN_COOLER_ID + ", "
+                        + COOLER_COLUMN_COOLER_SERIAL + ", "
+                        + " FROM " + TABLE_BOOK + ";"
+                )
+                database.execSQL("ALTER TABLE  " + TABLE_BOOK
+                        + " RENAME TO _OLD_BOOK")
+                database.execSQL("ALTER TABLE  " + TABLE_BOOK + "_NEW"
+                        + " RENAME TO " + TABLE_BOOK)
+                database.execSQL("DROP TABLE _OLD_BOOK")
+
+
+//                database.setTransactionSuccessful()
+//                database.endTransaction()
 
 //                db.setForeignKeyConstraintsEnabled(true)
 
