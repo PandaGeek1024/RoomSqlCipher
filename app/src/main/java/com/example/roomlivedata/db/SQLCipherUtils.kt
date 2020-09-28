@@ -166,21 +166,61 @@ object SQLCipherUtils {
         encrypt(ctxt, originalFile, SQLiteDatabase.getBytes(passphrase))
     }
 
-    /**
-     * Replaces this database with a version encrypted with the supplied
-     * passphrase, deleting the original. Do not call this while the database
-     * is open, which includes during any Room migrations.
-     *
-     * The passphrase is untouched in this call. If you are going to turn around
-     * and use it with SafeHelperFactory.fromUser(), fromUser() will clear the
-     * passphrase. If not, please set all bytes of the passphrase to 0 or something
-     * to clear out the passphrase.
-     *
-     * @param ctxt a Context
-     * @param originalFile a File pointing to the database
-     * @param passphrase the passphrase from the user
-     * @throws IOException
-     */
+//    /**
+//     * Replaces this database with a version encrypted with the supplied
+//     * passphrase, deleting the original. Do not call this while the database
+//     * is open, which includes during any Room migrations.
+//     *
+//     * The passphrase is untouched in this call. If you are going to turn around
+//     * and use it with SafeHelperFactory.fromUser(), fromUser() will clear the
+//     * passphrase. If not, please set all bytes of the passphrase to 0 or something
+//     * to clear out the passphrase.
+//     *
+//     * @param ctxt a Context
+//     * @param originalFile a File pointing to the database
+//     * @param passphrase the passphrase from the user
+//     * @throws IOException
+//     */
+//    @Throws(IOException::class)
+//    fun encrypt(
+//        context: Context,
+//        originalFile: File,
+//        passphrase: ByteArray?
+//    ) {
+//        SQLiteDatabase.loadLibs(context)
+//        if (originalFile.exists()) {
+//            val newFile = File.createTempFile(
+//                "sqlcipherutils", "tmp",
+//                context.cacheDir
+//            )
+//            var db =
+//                SQLiteDatabase.openDatabase(
+//                    originalFile.absolutePath,
+//                    "", null, SQLiteDatabase.OPEN_READWRITE
+//                )
+//            val version = db.version
+//            db.close()
+//            db = SQLiteDatabase.openDatabase(
+//                newFile.absolutePath, passphrase,
+//                null, SQLiteDatabase.OPEN_READWRITE, null, null
+//            )
+//            val st =
+//                db.compileStatement("ATTACH DATABASE ? AS plaintext KEY ''")
+//            st.bindString(1, originalFile.absolutePath)
+//            st.execute()
+//            db.rawExecSQL("SELECT sqlcipher_export('main', 'plaintext')")
+//            db.rawExecSQL("DETACH DATABASE plaintext")
+//
+//            db.version = version
+//            st.close()
+//            db.close()
+//            originalFile.delete()
+//            newFile.renameTo(originalFile)
+//        } else {
+//            throw FileNotFoundException(originalFile.absolutePath + " not found")
+//        }
+//    }
+
     @Throws(IOException::class)
     fun encrypt(
         context: Context,
@@ -189,33 +229,17 @@ object SQLCipherUtils {
     ) {
         SQLiteDatabase.loadLibs(context)
         if (originalFile.exists()) {
-            val newFile = File.createTempFile(
-                "sqlcipherutils", "tmp",
-                context.cacheDir
-            )
+            val newFile = File("/data/user/0/com.example.roomlivedata/databases/encrypted_word_database")
             var db =
                 SQLiteDatabase.openDatabase(
                     originalFile.absolutePath,
                     "", null, SQLiteDatabase.OPEN_READWRITE
                 )
-            val version = db.version
-            db.close()
-            db = SQLiteDatabase.openDatabase(
-                newFile.absolutePath, passphrase,
-                null, SQLiteDatabase.OPEN_READWRITE, null, null
-            )
-            val st =
-                db.compileStatement("ATTACH DATABASE ? AS plaintext KEY ''")
-            st.bindString(1, originalFile.absolutePath)
-            st.execute()
-            db.rawExecSQL("SELECT sqlcipher_export('main', 'plaintext')")
-            db.rawExecSQL("DETACH DATABASE plaintext")
+            db.rawExecSQL("ATTACH DATABASE ${newFile.absolutePath} AS encrypted KEY '123456789'")
+            db.rawExecSQL("SELECT sqlcipher_export('encrypted')")
+            db.rawExecSQL("DETACH DATABASE encrypted")
 
-            db.version = version
-            st.close()
             db.close()
-            originalFile.delete()
-            newFile.renameTo(originalFile)
         } else {
             throw FileNotFoundException(originalFile.absolutePath + " not found")
         }
