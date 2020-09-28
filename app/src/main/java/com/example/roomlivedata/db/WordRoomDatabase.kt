@@ -97,7 +97,6 @@ abstract class WordRoomDatabase : RoomDatabase() {
         private val MIGRATION_2_3: Migration = object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 println("Migrate2_3........")
-//                database.execSQL("PRAGMA foreign_keys=off;")
                 database.execSQL(
                     "CREATE TABLE  " + TABLE_BOOK
                             + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
@@ -108,7 +107,6 @@ abstract class WordRoomDatabase : RoomDatabase() {
                 database.execSQL(
                     "INSERT INTO " + TABLE_BOOK + " VALUES ( null, 1, 987)"
                 )
-//                database.execSQL("PRAGMA foreign_keys=on;")
             }
         }
 
@@ -116,11 +114,6 @@ abstract class WordRoomDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 println("Migrate3_4........")
 //                database.execSQL("PRAGMA foreign_keys=OFF;")
-
-                val db = database as SQLiteDatabase
-//                db.setForeignKeyConstraintsEnabled(false)
-
-//                database.beginTransaction()
 
                 database.execSQL(
                     "CREATE TABLE  " + TABLE_COOLERS_CACHE + "_NEW"
@@ -158,7 +151,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
                         + " SELECT "
                         + COOLER_COLUMN_ID + ", "
                         + COOLER_COLUMN_COOLER_ID + ", "
-                        + COOLER_COLUMN_COOLER_SERIAL + ", "
+                        + COOLER_COLUMN_COOLER_SERIAL
                         + " FROM " + TABLE_BOOK + ";"
                 )
                 database.execSQL("ALTER TABLE  " + TABLE_BOOK
@@ -166,12 +159,6 @@ abstract class WordRoomDatabase : RoomDatabase() {
                 database.execSQL("ALTER TABLE  " + TABLE_BOOK + "_NEW"
                         + " RENAME TO " + TABLE_BOOK)
                 database.execSQL("DROP TABLE _OLD_BOOK")
-
-
-//                database.setTransactionSuccessful()
-//                database.endTransaction()
-
-//                db.setForeignKeyConstraintsEnabled(true)
 
 //                database.execSQL("PRAGMA foreign_keys=ON;")
             }
@@ -199,7 +186,6 @@ abstract class WordRoomDatabase : RoomDatabase() {
                     .build()
 
                 INSTANCE = instance
-//                instance.openHelper.writableDatabase.setForeignKeyConstraintsEnabled(false)
                 return instance
             }
         }

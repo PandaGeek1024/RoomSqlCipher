@@ -211,10 +211,6 @@ object SQLCipherUtils {
             db.rawExecSQL("SELECT sqlcipher_export('main', 'plaintext')")
             db.rawExecSQL("DETACH DATABASE plaintext")
 
-            //testCode
-            db.setForeignKeyConstraintsEnabled(false)
-            //testCode
-
             db.version = version
             st.close()
             db.close()
