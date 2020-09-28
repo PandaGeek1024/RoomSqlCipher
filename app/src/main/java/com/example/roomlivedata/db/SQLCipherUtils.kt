@@ -236,13 +236,7 @@ object SQLCipherUtils {
                     originalFile.absolutePath,
                     "", null, SQLiteDatabase.OPEN_READWRITE
                 )
-            val encryptedDb = SQLiteDatabase.openDatabase(
-                newFile.absolutePath, passphrase,
-                null, SQLiteDatabase.OPEN_READWRITE, null, null
-            )
-            encryptedDb.rawExecSQL("SELECT name FROM sqlite_master ")
-            val version = encryptedDb.version
-            encryptedDb.close()
+
             val st =
                 db.compileStatement("ATTACH DATABASE ? AS encrypted KEY '123456789'")
             st.bindString(1, newFile.absolutePath)
@@ -251,7 +245,14 @@ object SQLCipherUtils {
             db.rawExecSQL("SELECT sqlcipher_export('encrypted')")
             db.rawExecSQL("DETACH DATABASE encrypted")
 
-
+            val encryptedDb = SQLiteDatabase.openDatabase(
+                newFile.absolutePath, passphrase,
+                null, SQLiteDatabase.OPEN_READWRITE, null, null
+            )
+            encryptedDb.version = db.version
+//            encryptedDb.rawExecSQL("SELECT name FROM sqlite_master ")
+//            val version = encryptedDb.version
+            encryptedDb.close()
 
             db.close()
         } else {
