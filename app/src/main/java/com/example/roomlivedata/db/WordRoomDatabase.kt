@@ -25,23 +25,13 @@ abstract class WordRoomDatabase : RoomDatabase() {
         private val scope: CoroutineScope? =null
     ) : RoomDatabase.Callback() {
 
-        override fun onCreate(db: SupportSQLiteDatabase) {
-            super.onCreate(db)
-//            db.setForeignKeyConstraintsEnabled(true)
-        }
-
         override fun onOpen(db: SupportSQLiteDatabase) {
             super.onOpen(db)
-            if (!db.isReadOnly()) {
-                // Enable foreign key constraints
-                db.execSQL("PRAGMA foreign_keys=ON;");
+            INSTANCE?.let { database ->
+                scope?.launch {
+                    populateDatabase(database.wordDao())
+                }
             }
-            println()
-//            INSTANCE?.let { database ->
-//                scope.launch {
-//                    populateDatabase(database.wordDao())
-//                }
-//            }
         }
 
         suspend fun populateDatabase(wordDao: WordDao) {
@@ -67,14 +57,12 @@ abstract class WordRoomDatabase : RoomDatabase() {
         private var INSTANCE: WordRoomDatabase? = null
 
         const val TABLE_BOOK = "book_table"
-        const val TABLE_COOLERS_CACHE =
-            "coolers" //rename as device or controller.  In future we may track more than coolers
+        const val TABLE_COOLERS_CACHE = "coolers"
         const val COOLER_COLUMN_ID = "_id"
         const val COOLER_COLUMN_COOLER_SERIAL = "serial"
-        const val COOLER_COLUMN_COOLER_OEM_ID = "oemId" //rename to oem_id
-        const val COOLER_COLUMN_COOLER_BOTTLER_ID = "bottlerId" //rename to bottler_id
-        const val COOLER_COLUMN_COOLER_ID = "name" //rename
-        const val COOLER_COLUMN_LIGHTING_PRESET = "lightingPreset"
+        const val COOLER_COLUMN_COOLER_OEM_ID = "oemId"
+        const val COOLER_COLUMN_COOLER_BOTTLER_ID = "bottlerId"
+        const val COOLER_COLUMN_COOLER_ID = "name"
 
         const val DB_NAME = "word_database"
         const val encryptPassword = "123456789"
@@ -88,8 +76,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
                             + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
                             + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
                             + COOLER_COLUMN_COOLER_OEM_ID + " INTEGER NOT NULL DEFAULT 0, "
-                            + COOLER_COLUMN_COOLER_BOTTLER_ID + " INTEGER NOT NULL DEFAULT 0, "
-                            + COOLER_COLUMN_LIGHTING_PRESET + " INTEGER NOT NULL DEFAULT 0 )"
+                            + COOLER_COLUMN_COOLER_BOTTLER_ID + " INTEGER NOT NULL DEFAULT 0)"
                 )
                 database.execSQL(
                     "INSERT INTO " + TABLE_COOLERS_CACHE + " VALUES ( null, '123', 987, 456, 123)"
@@ -124,16 +111,14 @@ abstract class WordRoomDatabase : RoomDatabase() {
                             + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
                             + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
                             + COOLER_COLUMN_COOLER_OEM_ID + " INTEGER NOT NULL DEFAULT 0, "
-                            + COOLER_COLUMN_COOLER_BOTTLER_ID + " INTEGER NOT NULL DEFAULT 0, "
-                            + COOLER_COLUMN_LIGHTING_PRESET + " INTEGER NOT NULL DEFAULT 0 )"
+                            + COOLER_COLUMN_COOLER_BOTTLER_ID + " INTEGER NOT NULL DEFAULT 0)"
                 )
                 database.execSQL("INSERT INTO " + TABLE_COOLERS_CACHE + "_NEW"
                         + " SELECT "
                         + COOLER_COLUMN_ID + ", "
                         + COOLER_COLUMN_COOLER_SERIAL + ", "
                         + COOLER_COLUMN_COOLER_OEM_ID + ", "
-                        + COOLER_COLUMN_COOLER_BOTTLER_ID + ", "
-                        + COOLER_COLUMN_LIGHTING_PRESET
+                        + COOLER_COLUMN_COOLER_BOTTLER_ID
                         + " FROM " + TABLE_COOLERS_CACHE + ";"
                 )
                 database.execSQL("ALTER TABLE  " + TABLE_COOLERS_CACHE
@@ -173,7 +158,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
 
             val state = SQLCipherUtils.getDatabaseState(context, DB_NAME)
             if (state == SQLCipherUtils.State.UNENCRYPTED) {
-                SQLCipherUtils.encrypt(context, DB_NAME, encryptPassword)
+                SQLCipherUtils.encrypt(context, DB_NAME, encryptPassword.toCharArray())
             }
             return INSTANCE ?: synchronized(this) {
                 val passphrase = SQLiteDatabase.getBytes(encryptPassword.toCharArray())
@@ -182,7 +167,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     WordRoomDatabase::class.java,
-                    "encrypted_word_database"
+                    DB_NAME
                 )
                     .openHelperFactory(factory)
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
