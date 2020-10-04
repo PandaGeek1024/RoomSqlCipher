@@ -134,8 +134,8 @@ abstract class WordRoomDatabase : RoomDatabase() {
                 database.execSQL("DROP TABLE _OLD_COOLERS")
 
 
-//                // uncomment these to fix the foreign key update problem.
-//                // create a new book table to re-point to coolers table
+                // uncomment below to fix the foreign key update problem.
+                // This re-creates a new book table to re-point to coolers table
 //                database.execSQL(
 //                    "CREATE TABLE  " + TABLE_BOOK + "_NEW"
 //                            + " (" + BOOK_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
