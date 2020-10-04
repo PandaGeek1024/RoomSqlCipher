@@ -156,7 +156,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
 //                        + " RENAME TO " + TABLE_BOOK)
 //                database.execSQL("DROP TABLE _OLD_BOOK")
 //
-//                database.execSQL("PRAGMA foreign_keys=ON;")
+                database.execSQL("PRAGMA foreign_keys=ON;")
             }
         }
         fun getDatabase(
