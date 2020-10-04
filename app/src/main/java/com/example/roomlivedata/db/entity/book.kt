@@ -18,12 +18,12 @@ import com.example.roomlivedata.db.WordRoomDatabase
 )
 class Book {
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = WordRoomDatabase.COOLER_COLUMN_ID)
-    var coolerId: Long = 0
+    @ColumnInfo(name = WordRoomDatabase.BOOK_COLUMN_ID)
+    var bookId: Long = 0
 
     @ColumnInfo(name = WordRoomDatabase.COOLER_COLUMN_COOLER_ID)
-    var scsCoolerName: Long = 0
+    var coolerId: Long = 0
 
-    @ColumnInfo(name = WordRoomDatabase.COOLER_COLUMN_COOLER_SERIAL)
-    var coolerSerialNumber: String = ""
+    @ColumnInfo(name = WordRoomDatabase.BOOK_COLUMN_NAME)
+    var bookName: String = ""
 }
