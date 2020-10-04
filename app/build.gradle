@@ -48,11 +48,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.archLifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-alpha01"
 
-// Kotlin components
-//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-//    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$rootProject.coroutines"
-//    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutines"
-
     // Material design
     implementation "com.google.android.material:material:$rootProject.materialVersion"
 

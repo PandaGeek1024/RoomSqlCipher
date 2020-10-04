@@ -64,6 +64,9 @@ abstract class WordRoomDatabase : RoomDatabase() {
         const val COOLER_COLUMN_COOLER_BOTTLER_ID = "bottlerId"
         const val COOLER_COLUMN_COOLER_ID = "name"
 
+        const val BOOK_COLUMN_ID = "_id"
+        const val BOOK_COLUMN_NAME = "name"
+
         const val DB_NAME = "word_database"
         const val encryptPassword = "123456789"
 
@@ -79,7 +82,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
                             + COOLER_COLUMN_COOLER_BOTTLER_ID + " INTEGER NOT NULL DEFAULT 0)"
                 )
                 database.execSQL(
-                    "INSERT INTO " + TABLE_COOLERS_CACHE + " VALUES ( null, '123', 987, 456, 123)"
+                    "INSERT INTO " + TABLE_COOLERS_CACHE + " VALUES ( null, '123', 987, 456)"
                 )
 
             }
@@ -90,13 +93,13 @@ abstract class WordRoomDatabase : RoomDatabase() {
                 println("Migrate2_3........")
                 database.execSQL(
                     "CREATE TABLE  " + TABLE_BOOK
-                            + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
+                            + " (" + BOOK_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
                             + COOLER_COLUMN_COOLER_ID + " INTEGER NOT NULL, "
-                            + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
+                            + BOOK_COLUMN_NAME + " TEXT NOT NULL, "
                             + " FOREIGN KEY (" + COOLER_COLUMN_COOLER_ID + ") REFERENCES " + TABLE_COOLERS_CACHE + "(" + COOLER_COLUMN_ID + ") ON DELETE CASCADE )"
                 )
                 database.execSQL(
-                    "INSERT INTO " + TABLE_BOOK + " VALUES ( null, 1, 987)"
+                    "INSERT INTO " + TABLE_BOOK + " VALUES ( null, 1, helloWorld)"
                 )
             }
         }
@@ -128,19 +131,20 @@ abstract class WordRoomDatabase : RoomDatabase() {
                 database.execSQL("DROP TABLE _OLD_COOLERS")
 
 
-//                //try create a new book table to point to coolers table
+//                // uncomment these to fix the foreign key update problem.
+//                // create a new book table to re-point to coolers table
 //                database.execSQL(
 //                    "CREATE TABLE  " + TABLE_BOOK + "_NEW"
-//                            + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
+//                            + " (" + BOOK_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
 //                            + COOLER_COLUMN_COOLER_ID + " INTEGER NOT NULL, "
-//                            + COOLER_COLUMN_COOLER_SERIAL + " TEXT NOT NULL, "
+//                            + BOOK_COLUMN_NAME + " TEXT NOT NULL, "
 //                            + " FOREIGN KEY (" + COOLER_COLUMN_COOLER_ID + ") REFERENCES " + TABLE_COOLERS_CACHE + "(" + COOLER_COLUMN_ID + ") ON DELETE CASCADE )"
 //                )
 //                database.execSQL("INSERT INTO " + TABLE_BOOK + "_NEW"
 //                        + " SELECT "
-//                        + COOLER_COLUMN_ID + ", "
+//                        + BOOK_COLUMN_ID + ", "
 //                        + COOLER_COLUMN_COOLER_ID + ", "
-//                        + COOLER_COLUMN_COOLER_SERIAL
+//                        + BOOK_COLUMN_NAME
 //                        + " FROM " + TABLE_BOOK + ";"
 //                )
 //                database.execSQL("ALTER TABLE  " + TABLE_BOOK
@@ -148,8 +152,8 @@ abstract class WordRoomDatabase : RoomDatabase() {
 //                database.execSQL("ALTER TABLE  " + TABLE_BOOK + "_NEW"
 //                        + " RENAME TO " + TABLE_BOOK)
 //                database.execSQL("DROP TABLE _OLD_BOOK")
-
-                database.execSQL("PRAGMA foreign_keys=ON;")
+//
+//                database.execSQL("PRAGMA foreign_keys=ON;")
             }
         }
         fun getDatabase(
