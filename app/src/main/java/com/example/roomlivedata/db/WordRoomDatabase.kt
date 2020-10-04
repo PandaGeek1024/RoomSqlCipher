@@ -107,8 +107,11 @@ abstract class WordRoomDatabase : RoomDatabase() {
         private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 println("Migrate3_4........")
+                // disable foreign key and enable it later during migration used to update foreign
+                // key successfully.
                 database.execSQL("PRAGMA foreign_keys=OFF;")
 
+                // Recreate coolers table
                 database.execSQL(
                     "CREATE TABLE  " + TABLE_COOLERS_CACHE + "_NEW"
                             + " (" + COOLER_COLUMN_ID + " INTEGER primary key autoincrement NOT NULL, "
