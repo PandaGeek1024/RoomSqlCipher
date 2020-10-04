@@ -65,7 +65,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
         const val COOLER_COLUMN_COOLER_ID = "name"
 
         const val BOOK_COLUMN_ID = "_id"
-        const val BOOK_COLUMN_NAME = "name"
+        const val BOOK_COLUMN_NAME = "bookName"
 
         const val DB_NAME = "word_database"
         const val encryptPassword = "123456789"
@@ -99,7 +99,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
                             + " FOREIGN KEY (" + COOLER_COLUMN_COOLER_ID + ") REFERENCES " + TABLE_COOLERS_CACHE + "(" + COOLER_COLUMN_ID + ") ON DELETE CASCADE )"
                 )
                 database.execSQL(
-                    "INSERT INTO " + TABLE_BOOK + " VALUES ( null, 1, helloWorld)"
+                    "INSERT INTO " + TABLE_BOOK + " VALUES ( null, 1, 'helloWorld')"
                 )
             }
         }
